@@ -1,10 +1,12 @@
 FROM node:16
 
-COPY packege*.json ./
+WORKDIR /usr/app
+
+COPY packege*.json /usr/app
 
 RUN npm install
 
-COPY . .
+COPY . /usr/app
 
 EXPOSE 3000
 
