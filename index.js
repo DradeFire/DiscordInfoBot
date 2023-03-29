@@ -86,7 +86,7 @@ bot.on("messageCreate", (msg) => {
 					})
 				})
 			})
-		}, 86400_000)
+		}, 86400_000);
 
 	}
 	if (msg.content.indexOf("Week_Info") === 0 && !isInfoShareStarted_week) {
