@@ -2,11 +2,7 @@ FROM node:14-alpine
 
 WORKDIR /usr/src/app
 
-COPY ./packege.json /usr/src/app
-
-CMD ["cd", "/usr/src/app"]
-
-RUN npm install -g dotenv
+COPY ./package.json .
 
 RUN npm install
 
