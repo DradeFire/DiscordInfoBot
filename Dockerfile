@@ -1,14 +1,16 @@
 FROM node:14-alpine
 
-RUN mkdir -p /usr/src/app
-
 WORKDIR /usr/src/app
 
-COPY ./packege*.json /usr/src/app
+COPY ./packege.json /usr/src/app
+
+CMD ["cd", "/usr/src/app"]
+
+RUN npm install -g dotenv
 
 RUN npm install
 
-COPY . /usr/src/app
+COPY . .
 
 EXPOSE 3000
 
