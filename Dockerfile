@@ -2,7 +2,7 @@ FROM node:16
 
 COPY packege*.json ./
 
-RUN npm i
+RUN npm install
 
 COPY . .
 
