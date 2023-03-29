@@ -1,15 +1,15 @@
 FROM node:14-alpine
 
+RUN mkdir -p /usr/src/app
+
 WORKDIR /usr/src/app
 
-COPY ./packege*.json .
+COPY ./packege*.json /usr/src/app
 
-# CMD [ "cd", "/usr/src/app" ]
+RUN npm install
 
-RUN npm i
-
-COPY . .
+COPY . /usr/src/app
 
 EXPOSE 3000
 
-CMD ["node", "."]
+CMD ["npm", "run", "start"]
