@@ -1,8 +1,8 @@
 FROM node:18
 
-# WORKDIR /usr/src/app
+WORKDIR /usr/src/app
 
-COPY packege*.json ./
+COPY ./packege*.json ./
 
 RUN npm i
 
