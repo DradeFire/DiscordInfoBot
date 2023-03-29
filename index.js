@@ -8,7 +8,7 @@ const fs = require('fs');
 const axios = require('axios');
 const { wrapper } = require('axios-cookiejar-support');
 const { CookieJar } = require('tough-cookie');
-
+const Xvfb = require('xvfb');
 const jar = new CookieJar();
 const client = wrapper(axios.create({ jar }));
 const Nightmare = require('nightmare')
@@ -18,6 +18,9 @@ var bot = new Discord.Client({ intents: [IntentsBitField.Flags.MessageContent, I
 
 var isInfoShareStarted_week = false
 var isInfoShareStarted_daily = false
+
+var xvfb = new Xvfb();
+xvfb.startSync();
 
 
 bot.on("ready", function () {
