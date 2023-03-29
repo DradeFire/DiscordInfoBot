@@ -4,12 +4,12 @@ WORKDIR /usr/src/app
 
 COPY ./packege*.json /usr/src/app
 
-CMD [ "cd", "/usr/src/app" ]
+# CMD [ "cd", "/usr/src/app" ]
 
 RUN npm i
 
-COPY . /usr/src/app
+COPY . .
 
 EXPOSE 3000
 
-CMD ["node", "/usr/src/app"]
+CMD ["node", "."]
