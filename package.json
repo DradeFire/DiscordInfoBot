@@ -2,7 +2,7 @@
   "name": "share_info_bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "index.js",
   "scripts": {
     "start": "node ."
   },

@@ -8,7 +8,7 @@ CMD [ "cd", "/usr/src/app" ]
 
 RUN npm i
 
-COPY . .
+COPY . /usr/src/app
 
 EXPOSE 3000
 
