@@ -1,13 +1,13 @@
-FROM node:16
+FROM node:18
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY packege*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
 EXPOSE 3000
 
-CMD ["node", "."]
+CMD ["npm", "run", "start"]

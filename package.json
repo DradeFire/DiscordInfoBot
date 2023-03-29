@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "test": " "
+    "start": "node ."
   },
   "author": "",
   "license": "ISC",
