@@ -1,6 +1,7 @@
 const dotenv = require('dotenv');
 dotenv.config()
 
+const process = require('process');
 const Discord = require('discord.js');
 const { IntentsBitField } = require('discord.js');
 const cheerio = require('cheerio');
@@ -12,16 +13,21 @@ const Xvfb = require('xvfb');
 const jar = new CookieJar();
 const client = wrapper(axios.create({ jar }));
 const Nightmare = require('nightmare')
-const nightmare = Nightmare({ show: false })
+const nightmare = Nightmare({ show: false, maxHeight: 8000 })
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const gm = require('gm');
 
 var bot = new Discord.Client({ intents: [IntentsBitField.Flags.MessageContent, IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages] });
 
 var isInfoShareStarted_week = false
-var isInfoShareStarted_daily = false
+var isInfoShareStarted_epic = false
+var isInfoShareStarted_xbox = false
 
 var xvfb = new Xvfb();
 xvfb.startSync();
 
+const document = new JSDOM().window.document
 
 bot.on("ready", function () {
 	console.log("Ready to begin!")
@@ -32,7 +38,6 @@ bot.on("disconnected", function () {
 });
 
 const getHTML = async (url) => {
-
 	try {
 		const { data } = await client.get(url, {
 			headers: {
@@ -49,31 +54,20 @@ const getHTML = async (url) => {
 	}
 }
 
+var gameList = []
+var msgList = []
+
 bot.on("messageCreate", (msg) => {
-	if (msg.content.indexOf("Daily_Info") === 0 && !isInfoShareStarted_daily) {
+	if (msg.content.indexOf("Daily") === 0 && !isInfoShareStarted_epic) {
 
-		isInfoShareStarted_daily = true
+		isInfoShareStarted_epic = true
 
-		msg.reply("На сегодня следующие раздачи:")
-		getHTML("https://ru.giveawayoftheday.com/").then(($) => {
-			$('.giveaway_buttons').each((_index, val) => {
-				$(val).find('a').each((_i, v) => {
-					console.log($(v).attr('href'))
-					msg.reply($(v).attr('href'))
-						.then(msg => {
-							setTimeout(() => msg.delete(), 86400_000)
-						})
-						.catch(e => {
-							console.log(e)
-						})
-				})
-			})
-		})
-
-		setInterval(() => {
-			console.log("day interval")
-			msg.reply("На сегодня следующие раздачи:")
+		const daily_fun = () => {
 			getHTML("https://ru.giveawayoftheday.com/").then(($) => {
+				msg.reply("На сегодня следующие раздачи:")
+					.then(msg => {
+						setTimeout(() => msg.delete(), 86400_000)
+					})
 				$('.giveaway_buttons').each((_index, val) => {
 					$(val).find('a').each((_i, v) => {
 						console.log($(v).attr('href'))
@@ -84,83 +78,149 @@ bot.on("messageCreate", (msg) => {
 							.catch(e => {
 								console.log(e)
 							})
-
-
 					})
 				})
 			})
+		}
+
+		daily_fun()
+
+		setInterval(() => {
+			console.log("interval (Daily)")
+			daily_fun()
 		}, 86400_000)
 
 	}
-	if (msg.content.indexOf("Week_Info") === 0 && !isInfoShareStarted_week) {
+	if (msg.content.indexOf("Epic") === 0 && !isInfoShareStarted_week) {
 
 		isInfoShareStarted_week = true
 
-		msg.reply("Epic Games - следующие раздачи:")
-		nightmare
-			.goto('http://store.epicgames.com/ru')
-			.evaluate(() => {
-				return document.body.innerHTML
-			})
-			.end()
-			.then((val) => {
-				const $ = cheerio.load(val)
-				$('.css-aere9z').each((_i1, v1) => {
-					$(v1).find('div').each((_i2, v2) => {
-						$(v2).find('a').each((_i3, v3) => {
-							const validateText = $(v3).attr('aria-label')
-							if (validateText.startsWith("Бесплатные игры")) {
-								console.log(validateText)
-								msg.reply('http://store.epicgames.com' + $(v3).attr('href'))
-									.then(msg => {
-										setTimeout(() => msg.delete(), 86400_000 * 7)
-									})
-									.catch(e => {
-										console.log(e)
-									})
-							}
-						})
-					})
-				})
-			})
-			.catch(error => {
-				console.error('Search failed:', error)
-			})
-
-
-		setInterval(() => {
-			console.log("week interval")
-			msg.reply("Epic Games - следующие раздачи:")
+		const epic_fun = () => {
 			nightmare
 				.goto('http://store.epicgames.com/ru')
+				.wait(5000)
 				.evaluate(() => {
 					return document.body.innerHTML
 				})
-				.end()
 				.then((val) => {
+					const localGameList = []
+					const localMsgList = []
+
 					const $ = cheerio.load(val)
 					$('.css-aere9z').each((_i1, v1) => {
 						$(v1).find('div').each((_i2, v2) => {
 							$(v2).find('a').each((_i3, v3) => {
 								const validateText = $(v3).attr('aria-label')
 								if (validateText.startsWith("Бесплатные игры")) {
+									localGameList.push('http://store.epicgames.com' + $(v3).attr('href'))
 									console.log(validateText)
-									msg.reply('http://store.epicgames.com' + $(v3).attr('href'))
-										.then(msg => {
-											setTimeout(() => msg.delete(), 86400_000 * 7)
-										})
-										.catch(e => {
-											console.log(e)
-										})
 								}
 							})
 						})
 					})
+					console.log(gameList.length)
+					console.log(localGameList.length)
+					if (gameList.length === localGameList.length) {
+						for (let index = 0; index < gameList.length; index++) {
+							if (gameList.at(index) !== localGameList.at(index)) {
+								for (let index = 0; index < gameList.length; index++) {
+									gameList.pop()
+								}
+								for (let index = 0; index < msgList.length; index++) {
+									msgList.at(index).delete()
+								}
+								localGameList.forEach((val, _i, _arr) => {
+									msg.reply(val)
+										.then(msg => {
+											localMsgList.push(msg)
+										})
+										.catch(e => {
+											console.log(e)
+										})
+								})
+								gameList = localGameList
+								msgList = localMsgList
+							}
+						}
+					} else {
+						for (let index = 0; index < gameList.length; index++) {
+							gameList.pop()
+						}
+						for (let index = 0; index < msgList.length; index++) {
+							msgList.at(index).delete()
+						}
+						localGameList.forEach((val, _i, _arr) => {
+							msg.reply(val)
+								.then(msg => {
+									localMsgList.push(msg)
+								})
+								.catch(e => {
+									console.log(e)
+								})
+						})
+						gameList = localGameList
+						msgList = localMsgList
+					}
 				})
 				.catch(error => {
 					console.error('Search failed:', error)
 				})
-		}, 86400_000 * 7);
+		}
+
+		epic_fun()
+
+		setInterval(() => {
+			console.log("interval (Epic)")
+			epic_fun()
+		}, 86400_000);
+	}
+	if (msg.content.indexOf("Xbox") === 0 && !isInfoShareStarted_xbox) {
+
+		isInfoShareStarted_xbox = true
+
+		const xbox_fun = () => {
+			nightmare
+				.viewport(1700, 1400)
+				.goto('https://www.xbox.com/ru-RU/xbox-game-pass/games#')
+				.click('.platpc')
+				.wait(2000)
+				.click("a[data-col=pcrecent]")
+				.wait(2000)
+				.scrollTo(1280, 200)
+				.screenshot('generated.png')
+				.then(() => {
+					gm("./generated.png")
+						.crop(1100, 1300, 350, 90)
+						.write('./generated2.png', (err) => {
+							console.log(err)
+							msg.channel.send("Свежее пополнение Xbox Game Pass: \nhttps://www.xbox.com/ru-RU/xbox-game-pass/games#")
+								.then(msg => {
+									setTimeout(() => msg.delete(), 86400_000 * 14)
+								})
+								.catch((err) => {
+									console.log(err)
+								});
+							msg.channel.send({ files: [{ attachment: "./generated2.png" }] })
+								.then(msg => {
+									setTimeout(() => msg.delete(), 86400_000 * 14)
+								})
+								.catch((err) => {
+									console.log(err)
+								});
+						})
+				})
+				.catch((err) => {
+					console.log(err)
+				})
+		}
+
+		xbox_fun()
+
+		setInterval(() => {
+			console.log("interval (Xbox)")
+			xbox_fun()
+		}, 86400_000 * 14)
+
 	}
 });
 

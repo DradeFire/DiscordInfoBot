@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "xvfb-run node --harmony ."
+    "start": "xvfb-run node --harmony .",
+    "dev": "nodemon ."
   },
   "author": "",
   "license": "ISC",
@@ -14,12 +15,14 @@
     "cheerio": "^1.0.0-rc.12",
     "discord.js": "^14.8.0",
     "dotenv": "^16.0.3",
+    "gm": "^1.25.0",
     "got": "^12.6.0",
     "jsdom": "^21.1.1",
     "nightmare": "^3.0.2",
     "node-phantom": "^0.2.5",
     "socket.io": "^0.9.17",
     "tough-cookie": "^4.1.2",
+    "url-to-image": "^1.0.0",
     "xvfb": "^0.4.0"
   }
 }
