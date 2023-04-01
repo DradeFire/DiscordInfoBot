@@ -183,10 +183,10 @@ bot.on("messageCreate", (msg) => {
 				.viewport(1700, 1400)
 				.goto('https://www.xbox.com/ru-RU/xbox-game-pass/games#')
 				.click('.platpc')
-				.wait(2000)
+				.wait(10000)
 				.click("a[data-col=pcrecent]")
-				.wait(2000)
-				.scrollTo(1280, 200)
+				.wait(10000)
+				.scrollTo(1100, 200)
 				.screenshot('generated.png')
 				.then(() => {
 					gm("./generated.png")
